@@ -1,41 +1,34 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
 
-type Pessoa struct {
-	nome string
-	idade string
-	telefone string 
-	email string
-}
-
-func (p Pessoa) Falar() {
-	fmt.Printf("Olá eu sou %v, tenho %v anos, meu e-mail é: %v\n", p.nome, p.idade, p.email)
-}
-
-func (p Pessoa) Comer() {
-	fmt.Printf("Estou comendo...")
-}
+	"github.com/MariaCeciliaa/stoq/internal/config"
+)
 
 func main() {
 
-	pessoa1 := Pessoa{
-		nome: "Cecilia",
-		idade: "19",
-		telefone: "9658745874",
-		email: "cecilia@email.com",
+	default_config := &config.Config{}
+
+	if file_config := os.Getenv("STOQ_FILE_CONFIG"); file_config != "" {
+
+		file, err := os.ReadFile(file_config)
+		if err != nil {
+			log.Panicln(err.Error())
+		}
+
+		err = json.Unmarshal(file, default_config)
+		if err != nil {
+			log.Panicln(err.Error())
+		}
 	}
 
-	pessoa2 := Pessoa{
-		nome: "Amanda",
-		idade: "15",
-		telefone: "9658745874",
-		email: "amanda@email.com",
-	}
+	conf := config.NewConfig(default_config)
 
-	pessoa1.Falar()
-	pessoa2.Falar()
+	data, _ := json.Marshal(conf)
 
-	pessoa1.Comer()
+	fmt.Println(string(data))
 }
-
